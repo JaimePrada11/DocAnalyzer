@@ -6,7 +6,6 @@ exports.uploadFiles = async (req, res) => {
   try {
     const form = new FormData();
 
-    // req.files viene de multer configurado en el gateway (debes agregarlo ahí también)
     for (const file of req.files) {
       form.append('files', file.buffer, file.originalname);
     }
