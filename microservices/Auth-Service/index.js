@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { sequelize } = require('./config/database');
-const Auth = require('./Rutas/authRutas')
+const { sequelize } = require('./src/config/database');
+const Auth = require('./src/Rutas/authRutas')
 
 const app = express();
 app.use(bodyParser.json());
