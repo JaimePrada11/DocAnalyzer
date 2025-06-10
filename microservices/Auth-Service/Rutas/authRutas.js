@@ -9,6 +9,6 @@ const loginValidator = require('../validators/authValidator');
 router.post('/register', authController.register );
 router.post('/login', validate, loginValidator, authController.login );
 router.post('/refresh-token', authController.refreshToken);
-router.get('/verify', verifyToken, authController.verify);
+router.post('/verify', verifyToken, authController.verify);
 
 module.exports = router;
