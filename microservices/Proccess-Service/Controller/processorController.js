@@ -2,7 +2,7 @@ const pdfParse = require('pdf-parse');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 require('dotenv').config();
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const genAI = new GoogleGenerativeAI('AIzaSyAHTeKpvd5dDDX7uYQsFCa_R8fKlcdX0Tg');
 
 const extractTextFromFile = async (buffer, mimetype) => {
     if (mimetype === 'application/pdf') {
