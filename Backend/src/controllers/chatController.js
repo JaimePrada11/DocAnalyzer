@@ -5,7 +5,7 @@ exports.createChat = async (req, res) => {
     try {
         const response = await requester({
             method: 'post',
-            url: `${process.env.DOCS_URL}/chat`,
+            url: `${process.env.DOCS_URL}/chats`,
             data: req.body,
             headers: { Authorization: req.headers.authorization }
         });
@@ -19,7 +19,7 @@ exports.getChats = async (req, res) => {
     try {
         const response = await requester({
             method: 'get',
-            url: `${process.env.DOCS_URL}/chat/${req.userId}`,
+            url: `${process.env.DOCS_URL}/chats/user/${req.userId}`,
             headers: { Authorization: req.headers.authorization }
         });
         res.json(response.data);
@@ -34,7 +34,7 @@ exports.getMessages = async (req, res) => {
 
         const response = await requester({
             method: 'get',
-            url: `${process.env.DOCS_URL}/chat/${chatId}/messages`,
+            url: `${process.env.DOCS_URL}/chats/${chatId}/messages`,
             headers: { Authorization: req.headers.authorization }
         });
         res.json(response.data);
@@ -46,34 +46,63 @@ exports.getMessages = async (req, res) => {
 exports.sendMessages = async (req, res) => {
     try {
         const { chatId } = req.params;
-        const { message } = req.body;
-        if (!message) return res.status(400).json({ message: 'El mensaje es requerido' });
+        const { userMessage, sender } = req.body; 
 
-        const chatHistorialResponse = await requester({
+        if (!chatId || isNaN(parseInt(chatId))) {
+            return res.status(400).json({ message: 'El ID del chat proporcionado es inválido.' });
+        }
+        if (!userMessage) {
+            return res.status(400).json({ message: 'El contenido del mensaje es requerido.' });
+        }
+        if (!sender) {
+            return res.status(400).json({ message: 'El remitente del mensaje es requerido (ej. "user" o "model").' });
+        }
+
+        const userMessageStoreResponse = await requester({
+            method: 'post',
+            url: `${process.env.DOCS_URL}/chats/${chatId}/messages`,
+            headers: { Authorization: req.headers.authorization },
+            data: {
+                sender: sender,
+                content: userMessage 
+            }
+        });
+
+
+        const chatHistoryResponse = await requester({
             method: 'get',
-            url: `${process.env.DOCS_URL}/chat/${chatId}/messages`,
+            url: `${process.env.DOCS_URL}/chats/${chatId}/messages`,
             headers: { Authorization: req.headers.authorization }
         });
-        const chatHistorial = chatHistorialResponse.data;
+        const chatHistory = chatHistoryResponse.data.map(msg => ({
+            sender: msg.sender, 
+            content: msg.content
+        }));
 
-        const geminiResponse = await requester({
+        const geminiAiResponse = await requester({
             method: 'post',
-            url: `${process.env.DOCS_URL}/chat/${chatId}/messages`,
+            url: `${process.env.AI_SERVICE_URL}/getChatResponse`, 
             headers: { Authorization: req.headers.authorization },
-            data: { message }
+            data: {
+                userMessage: userMessage, 
+                chatHistory: chatHistory 
+            }
         });
-        const gemini = geminiResponse.data;
+        const geminiReplyContent = geminiAiResponse.data.respuestaGemini; 
 
         await requester({
             method: 'post',
-            url: `${process.env.DOCS_URL}/chat/${chatId}/messages`,
+            url: `${process.env.DOCS_URL}/chats/${chatId}/messages`,
             headers: { Authorization: req.headers.authorization },
-            data: { message: `@${req.userId} ${gemini.message}` }
+            data: {
+                sender: 'model', 
+                content: geminiReplyContent
+            }
         });
 
-        res.status(200).json({ reply: gemini})
-
+        res.status(200).json({ reply: geminiReplyContent }); 
     } catch (err) {
-        res.status(err.response?.status || 500).json(err.response?.data || { message: 'Error al enviar mensaje' });
+        console.error('Error al enviar mensaje y obtener respuesta de Gemini:', err.message, err.response?.data);
+        res.status(err.response?.status || 500).json(err.response?.data || { message: 'Error interno del servidor al procesar el mensaje.' });
     }
-}
+};

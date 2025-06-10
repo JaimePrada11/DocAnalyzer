@@ -22,3 +22,16 @@ exports.uploadFiles = async (req, res) => {
     res.status(500).json({ message: 'Error reenviando archivos al microservicio' });
   }
 };
+
+exports.askGemini = async (req, res) => {
+  try {
+    const response = await axios.get(`${process.env.GEMINI_URL}/ask`, {
+      params: req.body
+    });
+    res.json(response.data);
+  } catch (err) {
+    console.error('Error en gateway:', err.message);
+    res.status(500).json({ message: 'Error reenviando peticiones al microservicio' });
+  }
+
+}
