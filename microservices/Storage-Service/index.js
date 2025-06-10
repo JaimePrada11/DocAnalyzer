@@ -1,13 +1,16 @@
 const express = require('express');
-const documentRoutes = require('./Rutas/documentRutas');
-const { sequelize } = require('./config/database');
+const documentRoutes = require('./src/Rutas/documentRutas');
+const chatRoutes = require('./src/Rutas/chatRutas');
+const { sequelize } = require('./src/config/database');
+
 
 require('dotenv').config();
 
 const app = express();
 app.use(express.json());
 
-app.use('/documents', documentRoutes);
+app.use('/', documentRoutes);
+app.use('/', chatRoutes )
 
 const PORT = process.env.PORT || 5000;
 
