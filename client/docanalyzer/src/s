@@ -1,0 +1,64 @@
+/* // App.jsx
+import { useState } from "react";
+import Header from "./components/Header";
+import SidebarPanel from "./components/SidebarPanel";
+import FileUploader from "./components/FileUploader";
+import FileSummaryPanel from "./components/FileSummaryPanel";
+import FileGallery from "./components/FileGallery";
+import FileDetailSidebar from "./components/FileDetailSidebar";
+import "./App.css";
+
+export default function App() {
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [showSidebar, setShowSidebar] = useState(false);
+
+  const handleFileClick = (file) => {
+    setSelectedFile(file);
+    setShowSidebar(true);
+  };
+
+  const mockFiles = [
+    {
+      id: 1,
+      name: "Contrato.pdf",
+      type: "PDF",
+      size: "1.2 MB",
+      location: "Documentos",
+      owner: "Yo",
+      modified: "Hace 1 hora",
+      activity: [
+        "Creado el 9 de junio",
+        "Editado el 10 de junio",
+        "Compartido con Maria",
+      ],
+    },
+    {
+      id: 2,
+      name: "Factura.docx",
+      type: "Word",
+      size: "850 KB",
+      location: "Facturas",
+      owner: "Yo",
+      modified: "Ayer",
+      activity: ["Subido el 8 de junio"],
+    },
+  ];
+
+  return (
+    <div className="flex h-screen w-full">
+      <SidebarPanel />
+      <div className="flex flex-col flex-1">
+        <Header />
+        <main className="flex-1 p-6 bg-gray-50 overflow-auto">
+          <FileUploader />
+          <FileSummaryPanel />
+          <FileGallery files={mockFiles} onFileClick={handleFileClick} />
+        </main>
+      </div>
+      {showSidebar && (
+        <FileDetailSidebar file={selectedFile} onClose={() => setShowSidebar(false)} />
+      )}
+    </div>
+  );
+}
+ */

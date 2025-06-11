@@ -1,0 +1,14 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; /* Ensures padding and border are included in the element's total width and height */
+  font-family: 'Inter', sans-serif; /* Set a default font family for consistency */
+}
+
+/* If your React app is mounted inside a div like <div id="root"></div> in index.html,
+   it's good practice to ensure it also takes full height */
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
