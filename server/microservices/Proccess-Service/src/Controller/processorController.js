@@ -54,7 +54,6 @@ const handleMultipleFiles = async (req, res) => {
             req.files.map(async (file) => {
                 const text = await extractTextFromFile(file.buffer, file.mimetype);
 
-                // 🔐 Hash SHA-256 para identificar duplicados/versiones
                 const hash = crypto.createHash('sha256').update(file.buffer).digest('hex');
 
                 const prompt = `
@@ -79,7 +78,6 @@ ${text}
                 const rawResponse = await getGeminiResponse(prompt);
                 const json = parseJsonFromResponse(rawResponse);
 
-                //  Metadatos del archivo
                 const metadata = {
                     nombre_original: file.originalname,
                     mime_type: file.mimetype,

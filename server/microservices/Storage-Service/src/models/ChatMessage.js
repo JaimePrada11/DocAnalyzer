@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
-// Importar Chat para definir la relación después de definir ChatMessage
 const Chat = require('./Chat');
 
 const ChatMessage = sequelize.define('ChatMessage', {

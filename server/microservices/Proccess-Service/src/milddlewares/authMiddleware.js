@@ -7,7 +7,6 @@ async function authMiddleware(req, res, next) {
     return res.status(401).json({ message: 'Token requerido' });
   }
 
-  // Extraer solo el token (sin "Bearer ")
   const token = bearer.startsWith('Bearer ') ? bearer.split(' ')[1] : bearer;
 
   try {
