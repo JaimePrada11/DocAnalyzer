@@ -11,3 +11,7 @@ export const register = (userData) => {
 export const verifyToken = () => {
   return api.post('/auth/verify');
 };
+
+export const getProfile = () =>{
+  return api.get('/auth/profile');
+}

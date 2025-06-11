@@ -9,7 +9,7 @@ const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-router.post('/', upload.array('files'), handleMultipleFiles);
+router.post('/',  upload.array('files'), handleMultipleFiles);
 router.post('/ask', upload.array('files'), askGemini);
 router.post('/getChatResponse', getChatResponseHandler);
 

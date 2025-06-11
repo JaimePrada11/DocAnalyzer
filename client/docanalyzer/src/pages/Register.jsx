@@ -14,7 +14,7 @@ const Register = () => {
   }, [user, navigate]);
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-emerald-50 font-sans relative">
+    <div className="min-h-screen mt-6 flex flex-col lg:flex-row bg-emerald-50 font-sans relative">
       <div className="hidden lg:flex w-full lg:w-1/2 relative z-0">
         <img
         src='https://cdn.dribbble.com/userupload/17751156/file/original-a9b29912fd1b2d0a2e311070633db80e.png?resize=2048x1290&vertical=center'

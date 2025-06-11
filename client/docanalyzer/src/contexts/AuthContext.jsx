@@ -1,4 +1,3 @@
-// src/contexts/AuthContext.js
 import { createContext, useState, useEffect } from 'react';
 import { verifyToken } from '../api/auth';
 

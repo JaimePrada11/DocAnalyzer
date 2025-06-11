@@ -1,6 +1,8 @@
 const pdfParse = require('pdf-parse');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 require('dotenv').config();
+const crypto = require('crypto');
+const path = require('path');
 
 const genAI = new GoogleGenerativeAI('AIzaSyAHTeKpvd5dDDX7uYQsFCa_R8fKlcdX0Tg');
 
@@ -48,15 +50,22 @@ const handleMultipleFiles = async (req, res) => {
             return res.status(400).json({ error: 'No se han subido archivos.' });
         }
 
-        const results = await Promise.all(req.files.map(async (file) => {
-            const text = await extractTextFromFile(file.buffer, file.mimetype);
+        const results = await Promise.all(
+            req.files.map(async (file) => {
+                const text = await extractTextFromFile(file.buffer, file.mimetype);
 
-            const prompt = `
+                // 🔐 Hash SHA-256 para identificar duplicados/versiones
+                const hash = crypto.createHash('sha256').update(file.buffer).digest('hex');
+
+                const prompt = `
 Analiza el siguiente documento y responde exclusivamente en un JSON válido con las claves:
 {
   "Nombre": "Nombre de la persona o entidad principal en el documento",
   "Documento": "Tipo y número de documento (ej. Cédula 123456789) si aplica, o 'N/A'",
   "Ubicación": "Ubicación relevante (ciudad, país) mencionada en el documento, o 'N/A'",
+  "Correo": "Correo electrónico si aparece, o 'N/A'",
+  "Teléfono": "Número de teléfono si aparece, o 'N/A'",
+  "Fecha": "Fecha del documento o fecha más relevante mencionada, o 'N/A'",
   "Puntos_clave": ["punto clave 1", "punto clave 2", "...", "máximo 5 puntos clave"],
   "Resumen": "Un resumen conciso y claro del documento (máximo 100 palabras)"
 }
@@ -67,28 +76,44 @@ DOCUMENTO:
 ${text}
 `;
 
-            const rawResponse = await getGeminiResponse(prompt);
-            const json = parseJsonFromResponse(rawResponse);
+                const rawResponse = await getGeminiResponse(prompt);
+                const json = parseJsonFromResponse(rawResponse);
 
-            return json
-                ? { archivo: file.originalname, ...json }
-                : {
-                    archivo: file.originalname,
-                    error: 'La respuesta de Gemini no es un JSON válido o no sigue la estructura esperada.',
-                    contenidoRecibido: rawResponse,
+                //  Metadatos del archivo
+                const metadata = {
+                    nombre_original: file.originalname,
+                    mime_type: file.mimetype,
+                    tamaño: file.size,
+                    extension: path.extname(file.originalname).replace('.', ''),
+                    fecha_subida: new Date().toISOString(),
+                    hash: hash
                 };
-        }));
+
+                return json
+                    ? {
+                        archivo: metadata,
+                        datos_extraidos: json
+                    }
+                    : {
+                        archivo: metadata,
+                        error: 'La respuesta de Gemini no es un JSON válido o no sigue la estructura esperada.',
+                        contenidoRecibido: rawResponse
+                    };
+            })
+        );
 
         res.json(results);
     } catch (err) {
         console.error('Error procesando archivos:', err);
-        res.status(500).json({ error: 'Ocurrió un error interno al procesar los archivos o al conectar con Gemini. Por favor, inténtalo de nuevo más tarde.' });
+        res.status(500).json({
+            error: 'Ocurrió un error interno al procesar los archivos o al conectar con Gemini. Por favor, inténtalo de nuevo más tarde.'
+        });
     }
 };
 
 const askGemini = async (req, res) => {
     try {
-        const { prompt: userPrompt } = req.body; 
+        const { prompt: userPrompt } = req.body;
 
         if (!userPrompt) {
             return res.status(400).json({ error: 'El mensaje (prompt) es obligatorio para esta solicitud.' });

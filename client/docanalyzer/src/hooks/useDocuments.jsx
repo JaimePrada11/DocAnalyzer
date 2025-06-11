@@ -32,5 +32,18 @@ export const useDocuments = () => {
     }
   };
 
-  return { processing, results, error, processDocuments, queryGemini };
+  const resetResults = () => {
+    setResults([]);
+    setError(null);
+    setProcessing(false);
+  };
+
+  return {
+    processing,
+    results,
+    error,
+    processDocuments,
+    queryGemini,
+    resetResults
+  };
 };

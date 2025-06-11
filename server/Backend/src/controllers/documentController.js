@@ -27,3 +27,21 @@ exports.getDocuments = async (req, res) => {
     res.status(err.response?.status || 500).json(err.response?.data || { message: 'Error al obtener documentos' });
   }
 };
+
+
+exports.getDocumentById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const response = await requester({
+      method: 'get',
+      url: `${process.env.DOCS_URL}/documents/${id}`,
+      headers: { Authorization: req.headers.authorization }
+    });
+    res.json(response.data);
+  } catch (err) {
+    res
+      .status(err.response?.status || 500)
+      .json(err.response?.data || { message: 'Error al obtener documento por ID' });
+  }
+};
