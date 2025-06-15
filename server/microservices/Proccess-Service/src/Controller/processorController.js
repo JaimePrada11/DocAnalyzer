@@ -4,7 +4,7 @@ require('dotenv').config();
 const crypto = require('crypto');
 const path = require('path');
 
-const genAI = new GoogleGenerativeAI('AIzaSyAHTeKpvd5dDDX7uYQsFCa_R8fKlcdX0Tg');
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_URL);
 
 const extractTextFromFile = async (buffer, mimetype) => {
     if (mimetype === 'application/pdf') {
